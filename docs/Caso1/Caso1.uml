@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>infracomp.caso1</OriginalElement>
+  <nodes>
+    <node x="629.4195663827184" y="205.22204226723625">infracomp.caso1.Consumidor</node>
+    <node x="0.0" y="0.0">infracomp.caso1.Productor</node>
+    <node x="329.30956706890646" y="202.53999798152915">infracomp.caso1.Buffer</node>
+    <node x="0.0" y="507.02872319277003">infracomp.caso1.Servidor</node>
+    <node x="2.804843090578089" y="367.02872319277003">infracomp.caso1.Mensaje</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="infracomp.caso1.Buffer" target="infracomp.caso1.Mensaje">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="infracomp.caso1.Consumidor" target="infracomp.caso1.Buffer">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="infracomp.caso1.Productor" target="infracomp.caso1.Mensaje">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="infracomp.caso1.Productor" target="infracomp.caso1.Buffer">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="426.0" y="268.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
