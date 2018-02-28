@@ -8,20 +8,14 @@ import java.util.Random;
 
 public class Servidor
 {
-	private Buffer buffer;
-
-	private Consumidor[] consumidores;
-
-	private Productor[] productores;
-
 	public Servidor( String confPath )
 	{
 		Properties p = loadConfig( confPath );
 
-		this.buffer = new Buffer( Integer.parseInt( p.getProperty( "servidor.buffer_size" ) ) );
-		this.consumidores = new Consumidor[ Integer.parseInt( p.getProperty( "servidor.cant_consumidores" ) ) ];
-		this.productores = new Productor[ Integer.parseInt( p.getProperty( "servidor.cant_productores" ) ) ];
-		Integer[] cantMensajes = Arrays.stream( p.getProperty( "servidor.cant_mensajes" ).split( "," ) )
+		Buffer buffer = new Buffer( Integer.parseInt( p.getProperty( "caso1.buffer_size" ) ) );
+		Consumidor[] consumidores = new Consumidor[ Integer.parseInt( p.getProperty( "caso1.cant_consumidores" ) ) ];
+		Productor[] productores = new Productor[ Integer.parseInt( p.getProperty( "caso1.cant_productores" ) ) ];
+		Integer[] cantMensajes = Arrays.stream( p.getProperty( "caso1.cant_mensajes" ).split( "," ) )
 				.map( Integer::parseInt )
 				.toArray( Integer[]::new );
 
@@ -33,7 +27,7 @@ public class Servidor
 
 		for( int i = 0; i < productores.length; i++ )
 		{
-			productores[ i ] = new Productor( this.buffer, cantMensajes[ i ] );
+			productores[ i ] = new Productor( buffer, cantMensajes[ i ] );
 			new Thread( productores[ i ], "Productor_" + i ).start( );
 		}
 	}
