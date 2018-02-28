@@ -1,16 +1,12 @@
-package infracomp.caso1.sistema;
-
-import java.time.ZonedDateTime;
+package infracomp.caso1;
 
 public class Mensaje
 {
 	private String content;
 
-	private Productor.TOPICS topic;
+	private Consumidor.TOPICS topic;
 
 	private String response;
-
-	private ZonedDateTime date;
 
 	public String getContent( )
 	{
@@ -32,22 +28,12 @@ public class Mensaje
 		this.response = response;
 	}
 
-	public ZonedDateTime getDate( )
-	{
-		return date;
-	}
-
-	public void setDate( ZonedDateTime date )
-	{
-		this.date = date;
-	}
-
-	public Productor.TOPICS getTopic( )
+	public Consumidor.TOPICS getTopic( )
 	{
 		return topic;
 	}
 
-	public void setTopic( Productor.TOPICS topic )
+	public void setTopic( Consumidor.TOPICS topic )
 	{
 		this.topic = topic;
 	}

@@ -1,4 +1,4 @@
-package infracomp.caso1.sistema;
+package infracomp.caso1;
 
 import java.util.LinkedList;
 import java.util.Queue;
