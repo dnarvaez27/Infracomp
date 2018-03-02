@@ -1,7 +1,16 @@
 package infracomp.caso1;
 
+/**
+ * Representa un Consumidor dentro del esquema {@link Productor} {@link Consumidor}<br>
+ *
+ * @author David Narvaez - (d.narvaez11@uniandes.edu.co)
+ * @author Daniela Jaimes - (d.jaimes@uniandes.edu.co)
+ */
 public class Consumidor implements Runnable
 {
+	/**
+	 * Topicos para los diferentes mensajes que pueden ser enviados por el Productor
+	 */
 	public enum TOPICS
 	{
 		RASTREAR_PKG( "RCV_PKG" ),
@@ -20,33 +29,58 @@ public class Consumidor implements Runnable
 		private String value;
 	}
 
+	/**
+	 * Instancia del Buffer del cual extraerá los mensajes de los Productores
+	 */
 	private final Buffer buffer;
 
+	/**
+	 * Cantidad de productores atendidos por todos los consumidores
+	 */
 	private static int productoresAtendidos = 0;
 
+	/**
+	 * Cantidad de productores totales en el sistema
+	 */
 	private final int cantProductores;
 
+	/**
+	 * Crea una instancia de un consumidor pasandole el Buffer y la cantidad de productores por parámetro
+	 *
+	 * @param buffer          Buffer que maneja los mensajes del sistema
+	 * @param cantProductores Cantidad total de productores en el sistema}
+	 * @see #run()
+	 */
 	public Consumidor( Buffer buffer, int cantProductores )
 	{
 		this.buffer = buffer;
 		this.cantProductores = cantProductores;
 	}
 
+	/**
+	 * Mientras aún existan Productores por atender, entonces constantemente intenta sacar mensajes del Buffer<br>
+	 * Cuando un mensaje es extraido del Buffer, se ejecuta el método {@link #responder(Mensaje)}.
+	 * Si no hay ningún mensaje en el Buffer, el Consumidor se queda esperando sobre el Buffer hasta que un {@link Productor} agrege u mensaje
+	 */
 	@Override
 	public void run( )
 	{
-		// Empieza a atendera los
+		// Se ejecuta mientras aún existan productores por atender
 		out:
 		while( Consumidor.productoresAtendidos < cantProductores )
 		{
+			// Intenta extraer el mensaje del Buffer
 			Mensaje msg;
 			while( ( msg = buffer.remove( ) ) == null )
 			{
+				// El Buffer está vacío por lo que entra a una espera pasiva sobre el buffer
 				synchronized( buffer )
 				{
 					try
 					{
 						buffer.wait( );
+
+						// Si al despertarse, todos los productores fueron ya atendidos, acaba su ejecución
 						if( cantProductores == Consumidor.productoresAtendidos )
 						{
 							break out;
@@ -68,6 +102,12 @@ public class Consumidor implements Runnable
 		}
 	}
 
+	/**
+	 * Responde al mensaje filtrandolo por mensaje por Topico <br>
+	 * Si el mensaje tiene como Topico {@link TOPICS#TERMINACION}, entonces se entenderá que el consumidor habrá terminado sus peticiones
+	 *
+	 * @param mensaje Mensaje a ser procesado
+	 */
 	private static void responder( Mensaje mensaje )
 	{
 		// System.out.println( "Proc_" + mensaje.getContent( ) );

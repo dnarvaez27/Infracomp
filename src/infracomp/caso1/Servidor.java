@@ -6,8 +6,20 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.Random;
 
+/**
+ * Clase que representa el servidor
+ *
+ * @author David Narvaez - (d.narvaez11@uniandes.edu.co)
+ * @author Daniela Jaimes - (d.jaimes@uniandes.edu.co)
+ */
 public class Servidor
 {
+	/**
+	 * Crea una instancia del Servidor<br>
+	 * Carga la configuración desde el archivo dado por parámetro y corre los Threads de Consumidor y Productor
+	 *
+	 * @param confPath Ruta del archivo de configuración
+	 */
 	public Servidor( String confPath )
 	{
 		Properties p = loadConfig( confPath );
@@ -32,6 +44,12 @@ public class Servidor
 		}
 	}
 
+	/**
+	 * Carga el archivo de configuración a un Objeto Properties
+	 *
+	 * @param confPath Ruta del archivo a cargar
+	 * @return Objeto de Properties con la configuración del archivo
+	 */
 	private Properties loadConfig( String confPath )
 	{
 		Properties p = new Properties( );
@@ -46,6 +64,11 @@ public class Servidor
 		return p;
 	}
 
+	/**
+	 * Corre el servidor con la configuración del archivo /conf/conf.properties
+	 *
+	 * @param args None
+	 */
 	public static void main( String... args )
 	{
 		new Servidor( "./conf/conf.properties" );
