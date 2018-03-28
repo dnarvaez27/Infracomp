@@ -69,6 +69,7 @@ public class Productor extends Thread
 					}
 				}
 
+				System.out.println( "Envió" );
 				// Despierta a los productores
 				synchronized( buffer )
 				{
@@ -79,6 +80,7 @@ public class Productor extends Thread
 				try
 				{
 					mensaje.wait( );
+					System.out.println( "Respondido" );
 				}
 				catch( InterruptedException e )
 				{

@@ -92,6 +92,7 @@ public class Consumidor implements Runnable
 					}
 				}
 			}
+			System.out.println( "Va a responder" );
 			responder( msg );
 		}
 

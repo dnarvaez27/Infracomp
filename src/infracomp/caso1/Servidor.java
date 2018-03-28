@@ -65,12 +65,12 @@ public class Servidor
 	}
 
 	/**
-	 * Corre el servidor con la configuración del archivo /conf/conf.properties
+	 * Corre el servidor con la configuración del archivo /conf/caso1_conf.properties
 	 *
 	 * @param args None
 	 */
 	public static void main( String... args )
 	{
-		new Servidor( "./conf/conf.properties" );
+		new Servidor( "./conf/caso1_conf.properties" );
 	}
 }
