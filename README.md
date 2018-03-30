@@ -9,3 +9,4 @@ Universidad de Los Andes
 
 ### Casos
 * **Caso 1:** Manejo de Concurrencia [Productor Consumidor]
+* **Caso 2:** Canales Seguros [Simetrico, Asimetrico, HMAC, Certificados Digitales]
