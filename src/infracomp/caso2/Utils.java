@@ -3,8 +3,21 @@ package infracomp.caso2;
 import javax.xml.bind.DatatypeConverter;
 import java.util.StringTokenizer;
 
+/**
+ * Clase de utilidades para el intercambio de información en el protocolo
+ *
+ * @author David Narvaez - 201516897
+ * @author Daniela Jaimes - 201531521
+ */
 class Utils
 {
+	/**
+	 * Une los items dados por parámetro con el appender proveido
+	 *
+	 * @param appender Token por el que unirá los items
+	 * @param items    Items a unir
+	 * @return String con los items unidos por el token proveido
+	 */
 	static String join( String appender, String... items )
 	{
 		StringBuilder sBuilder = new StringBuilder( );
@@ -16,6 +29,13 @@ class Utils
 		return sBuilder.toString( );
 	}
 
+	/**
+	 * Separa el string por el token dados por parámetro
+	 *
+	 * @param token Token por el cual separará el string
+	 * @param str   String a separar
+	 * @return Arreglo de String con los items separados por el token del string
+	 */
 	static String[] split( String token, String str )
 	{
 		StringTokenizer tokenizer = new StringTokenizer( str );
@@ -27,11 +47,23 @@ class Utils
 		return data;
 	}
 
+	/**
+	 * Convierte un arreglo de bytes en un String
+	 *
+	 * @param array Arreglo de bytes a transformar
+	 * @return String que contiene la representación léxica de xds:hexBinary
+	 */
 	static String arrayToHexString( byte[] array )
 	{
 		return DatatypeConverter.printHexBinary( array );
 	}
 
+	/**
+	 * Convierte un Strign con representación léxica de xds:hexBinary a un arreglo de bytes
+	 *
+	 * @param str String a convertir
+	 * @return Arreglo de bytes con la información del String dado por parámetro
+	 */
 	static byte[] hexToByteArray( String str )
 	{
 		return DatatypeConverter.parseHexBinary( str );
