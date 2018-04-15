@@ -55,7 +55,7 @@ class Utils
 	 */
 	static String arrayToHexString( byte[] array )
 	{
-		return DatatypeConverter.printHexBinary( array );
+		return DatatypeConverter.printHexBinary( array ).toUpperCase( );
 	}
 
 	/**
