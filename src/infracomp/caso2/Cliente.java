@@ -35,7 +35,7 @@ public class Cliente implements Runnable
 	/**
 	 * Enumeración que provee las palabras de control para el protocolo
 	 */
-	enum Protocolo
+	public enum Protocolo
 	{
 		HOLA( "HOLA" ),
 		INICIO( "INICIO" ),
@@ -52,7 +52,7 @@ public class Cliente implements Runnable
 		/**
 		 * Cadena de texto que se envía en el protocolo
 		 */
-		private String value;
+		public String value;
 
 		Protocolo( String value )
 		{
@@ -69,60 +69,60 @@ public class Cliente implements Runnable
 	/**
 	 * Puerto por el cual se comunicará al servidor
 	 */
-	public final static int PUERTO = 8080;
+	final static int PUERTO = 8080;
 
 	/**
 	 * IP del servidor
 	 */
-	private final static String IP = "52.15.203.191";
+	protected final static String IP = "52.15.203.191";
 
 	/**
 	 * Algoritmo que se utilizará para la encriptación simétrica
 	 */
-	private final static Cifrado.CipherAlgorithm algoritmoSimetrico = Cifrado.CipherAlgorithm.AES;
+	protected final static Cifrado.CipherAlgorithm algoritmoSimetrico = Cifrado.CipherAlgorithm.AES;
 
 	/**
 	 * Algoritmo que se utilizará para la encriptación asimétrica
 	 */
-	private final static Cifrado.CipherAlgorithm algoritmoAsimetrico = Cifrado.CipherAlgorithm.RSA;
+	protected final static Cifrado.CipherAlgorithm algoritmoAsimetrico = Cifrado.CipherAlgorithm.RSA;
 
 	/**
 	 * Algoritmo que se utilizará para la generación del Certificado. DEBE COINCIDIR CON EL ALGORITMO ASIMÉTRICO
 	 */
-	private final static Seguridad.KeyAlgorithm.Pair algoritmoCertificado = Seguridad.KeyAlgorithm.Pair.RSA_1024;
+	protected final static Seguridad.KeyAlgorithm.Pair algoritmoCertificado = Seguridad.KeyAlgorithm.Pair.RSA_1024;
 
 	/**
 	 * Algoritmo que se utilizará para la encriptación con HMAC
 	 */
-	private final static Cifrado.MacAlgorithm algoritmoHMAC = Cifrado.MacAlgorithm.HmacSHA256;
+	protected final static Cifrado.MacAlgorithm algoritmoHMAC = Cifrado.MacAlgorithm.HmacSHA256;
 
 	/**
 	 * Stream de salida del Socket para comunicación por flujo con el Servidor
 	 */
-	private OutputStream outStream;
+	protected OutputStream outStream;
 
 	/**
 	 * Stream de entrada del Socket para comunicación por flujo con el servidor
 	 */
-	private InputStream inStream;
+	protected InputStream inStream;
 
 	/**
 	 * Writer del Socket para comunicación del protocolo con el servidor
 	 */
-	private PrintWriter out;
+	protected PrintWriter out;
 
 	/**
 	 * Reader del Socket para comunicación del protocolo con el servidor
 	 */
-	private BufferedReader in;
+	protected BufferedReader in;
 
-	private PrintStream log;
+	protected PrintStream log;
 
-	private Utils.Registro<Registros> registro;
+	Utils.Registro<Registros> registro;
 
-	private Integer[] status;
+	protected Integer[] status;
 
-	private Double serverCpuUsage;
+	protected Double serverCpuUsage;
 
 	/**
 	 * Instancia un Cliente iniciando los canales de comunicación con el Socket
@@ -150,7 +150,7 @@ public class Cliente implements Runnable
 		}
 		else
 		{
-			log = new PrintStream( new FileOutputStream( "./docs/Caso3/out.txt" ), true );
+			log = new PrintStream( new FileOutputStream( "./docs/Caso3/server_logs.txt" ), true );
 		}
 	}
 
@@ -167,7 +167,7 @@ public class Cliente implements Runnable
 	 * @param lat Coordenadas de Latitud de la unidad
 	 * @param lon Coordenadas de Longitud de la unidad
 	 */
-	private void sendState( Double[] lat, Double[] lon )
+	protected void sendState( Double[] lat, Double[] lon )
 	{
 		try
 		{
@@ -184,13 +184,13 @@ public class Cliente implements Runnable
 			// ETAPA 2
 			log.println( "Inicio Etapa 2" );
 			clientCertificate = stage2( keyPair );
-			log.println( String.format( "Certificado Cliente:\n%s", clientCertificate ) );
+			// log.println( String.format( "Certificado Cliente:\n%s", clientCertificate ) );
 			log.println( "Fin Etapa 2" );
 
 			// ETAPA 3:
 			log.println( "Inicio Etapa 3" );
 			serverCertificate = stage3( );
-			log.println( String.format( "Certificado Servidor:\n%s", serverCertificate ) );
+			// log.println( String.format( "Certificado Servidor:\n%s", serverCertificate ) );
 			log.println( "Fin Etapa 3" );
 
 			// ETAPA 4:
@@ -203,7 +203,7 @@ public class Cliente implements Runnable
 		}
 		catch( Exception e )
 		{
-			// e.printStackTrace( );
+			e.printStackTrace( );
 			System.out.println( "ERROR: " + e.getMessage( ) );
 			out.println( join( Protocolo.SEP.value, Protocolo.ESTADO.value, Protocolo.ERROR.value ) );
 		}
@@ -218,7 +218,7 @@ public class Cliente implements Runnable
 	 *
 	 * @throws Exception En caso que haya un problema con la comunicación con el Servidor o no coincida con el protocolo
 	 */
-	private void stage1( ) throws Exception
+	protected void stage1( ) throws Exception
 	{
 		String line;
 		// INICIO DE SESION
@@ -249,7 +249,7 @@ public class Cliente implements Runnable
 	 * @return Certificado X509 v3 generado con las llaves proporcionadas
 	 * @throws Exception En caso que haya un error con la generación del certificado o en la comunicación con el Servidor
 	 */
-	private X509Certificate stage2( KeyPair keyPair ) throws Exception
+	protected X509Certificate stage2( KeyPair keyPair ) throws Exception
 	{
 		// ENVIAR CERTIFICADO
 		out.println( Protocolo.CERTCLNT.value );
@@ -273,7 +273,7 @@ public class Cliente implements Runnable
 	 * @return Certificado obtenido del Servidor
 	 * @throws Exception En caso que haya un error leyendo el certificado o en la comunicación con el Servidor
 	 */
-	private X509Certificate stage3( ) throws Exception
+	protected X509Certificate stage3( ) throws Exception
 	{
 		String line = evaluateForError( in.readLine( ) );
 		if( !line.equals( Protocolo.CERTSRV.value ) )
@@ -301,7 +301,7 @@ public class Cliente implements Runnable
 	 * @return Dos arreglos de bytes con la información enviada: Posición encriptada con la llave simétrica, Posición encriptada con la llave pública del Servidor y la función HMAC
 	 * @throws Exception En caso que haya un error en el protocolo con el Servidor o aAl realizar las operaciones de seguridad
 	 */
-	private byte[][] stage4( Double[] lat, Double[] lon, KeyPair keyPair, X509Certificate serverCertificate ) throws Exception
+	protected byte[][] stage4( Double[] lat, Double[] lon, KeyPair keyPair, X509Certificate serverCertificate ) throws Exception
 	{
 		// Inicio Registro
 		registro.start( Registros.LLAVE_SIMETRICA );
@@ -351,14 +351,14 @@ public class Cliente implements Runnable
 	 *
 	 * @throws Exception En caso que haya un error en el protocolo
 	 */
-	private void readResponseState( ) throws Exception
+	protected void readResponseState( ) throws Exception
 	{
 		evaluateForError( in.readLine( ) );
 	}
 
-	private String evaluateForError( String line ) throws Exception
+	protected String evaluateForError( String line ) throws Exception
 	{
-		if( line.startsWith( Protocolo.ERROR.value ) )
+		if( line.startsWith( Protocolo.ERROR.value ) || line.endsWith( Protocolo.ERROR.value ) )
 		{
 			throw new Exception( line );
 		}
@@ -372,5 +372,4 @@ public class Cliente implements Runnable
 				serverCpuUsage
 		};
 	}
-
 }

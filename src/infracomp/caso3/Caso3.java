@@ -15,25 +15,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings( "unchecked" )
 public class Caso3
 {
-	static class State
+	public static class State
 	{
-		private Integer numPool;
+		Integer numPool;
 
-		private Integer carga;
+		Integer carga;
 
-		private Integer gap;
+		Integer gap;
 
-		private Integer iter;
+		Integer iter;
 
-		private Long actualizacion;
+		Long actualizacion;
 
-		private Long llaveSimetrica;
+		Long llaveSimetrica;
 
-		private Double cpuUsage;
+		Double cpuUsage;
 
-		private Integer i;
+		Integer i;
 
-		private Integer j;
+		Integer j;
 
 		State( Integer i, Integer j, Integer numPool, Integer carga, Integer gap, Integer iter, Long actualizacion, Long llaveSimetrica, Double cpuUsage )
 		{
@@ -55,17 +55,16 @@ public class Caso3
 		}
 	}
 
-	public static void main( String... args )
+	private static final Integer iter = 10;
+
+	private static final Integer[] numPools = new Integer[]{ 1, 2, 8 };
+
+	protected static final Integer[] load = new Integer[]{ 400, 200, 80 };
+
+	protected static final Integer[] gap = new Integer[]{ 20, 40, 100 };
+
+	static void loadStates( ConcurrentLinkedQueue<State> leftStates, final AtomicInteger count )
 	{
-		final AtomicInteger count = new AtomicInteger( 0 );
-		ConcurrentLinkedQueue<State> leftStates = new ConcurrentLinkedQueue<>( );
-
-		int iter = 10;
-
-		Integer[] numPools = new Integer[]{ 1, 2, 8 };
-		Integer[] load = new Integer[]{ 400, 200, 80 };
-		Integer[] gap = new Integer[]{ 20, 40, 100 };
-
 		for( int j = 0; j < load.length; j++ )
 		{
 			for( Integer numPool : numPools )
@@ -81,6 +80,13 @@ public class Caso3
 				}
 			}
 		}
+	}
+
+	public static void main( String... args )
+	{
+		final AtomicInteger count = new AtomicInteger( 0 );
+		ConcurrentLinkedQueue<State> leftStates = new ConcurrentLinkedQueue<>( );
+		loadStates( leftStates, count );
 
 		System.out.println( "Init" );
 
