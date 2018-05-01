@@ -7,10 +7,12 @@ import infracomp.caso2.seguridad.Seguridad;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.KeyPair;
@@ -58,6 +60,12 @@ public class Cliente implements Runnable
 		}
 	}
 
+	public enum Registros
+	{
+		LLAVE_SIMETRICA,
+		ACTUALIZACION
+	}
+
 	/**
 	 * Puerto por el cual se comunicará al servidor
 	 */
@@ -66,7 +74,7 @@ public class Cliente implements Runnable
 	/**
 	 * IP del servidor
 	 */
-	private final static String IP = "localhost";
+	private final static String IP = "52.15.203.191";
 
 	/**
 	 * Algoritmo que se utilizará para la encriptación simétrica
@@ -108,12 +116,20 @@ public class Cliente implements Runnable
 	 */
 	private BufferedReader in;
 
+	private PrintStream log;
+
+	private Utils.Registro<Registros> registro;
+
+	private Integer[] status;
+
+	private Double serverCpuUsage;
+
 	/**
 	 * Instancia un Cliente iniciando los canales de comunicación con el Socket
 	 *
 	 * @throws IOException En caso que no sea posible establecer la comunicación con el Servidor
 	 */
-	public Cliente( ) throws IOException
+	public Cliente( boolean logs, Integer[] status ) throws IOException
 	{
 		Socket sock = new Socket( IP, PUERTO );
 
@@ -121,6 +137,21 @@ public class Cliente implements Runnable
 		inStream = sock.getInputStream( );
 		out = new PrintWriter( outStream, true );
 		in = new BufferedReader( new InputStreamReader( inStream ) );
+		registro = new Utils.Registro<>( );
+
+		if( status != null )
+		{
+			this.status = status;
+		}
+
+		if( logs )
+		{
+			log = System.out;
+		}
+		else
+		{
+			log = new PrintStream( new FileOutputStream( "./docs/Caso3/out.txt" ), true );
+		}
 	}
 
 	@Override
@@ -146,31 +177,34 @@ public class Cliente implements Runnable
 			byte[][] stage4;
 
 			// ETAPA 1
-			System.out.println( "Inicio Etapa 1" );
+			log.println( "Inicio Etapa 1" );
 			stage1( );
-			System.out.println( "Fin Etapa 1" );
+			log.println( "Fin Etapa 1" );
 
 			// ETAPA 2
-			System.out.println( "Inicio Etapa 2" );
+			log.println( "Inicio Etapa 2" );
 			clientCertificate = stage2( keyPair );
-			System.out.println( String.format( "Certificado Cliente:\n%s", clientCertificate ) );
-			System.out.println( "Fin Etapa 2" );
+			log.println( String.format( "Certificado Cliente:\n%s", clientCertificate ) );
+			log.println( "Fin Etapa 2" );
 
 			// ETAPA 3:
-			System.out.println( "Inicio Etapa 3" );
+			log.println( "Inicio Etapa 3" );
 			serverCertificate = stage3( );
-			System.out.println( String.format( "Certificado Servidor:\n%s", serverCertificate ) );
-			System.out.println( "Fin Etapa 3" );
+			log.println( String.format( "Certificado Servidor:\n%s", serverCertificate ) );
+			log.println( "Fin Etapa 3" );
 
 			// ETAPA 4:
-			System.out.println( "Inicio Etapa 4" );
+			log.println( "Inicio Etapa 4" );
 			stage4 = stage4( lat, lon, keyPair, serverCertificate );
-			System.out.println( Arrays.toString( Arrays.stream( stage4 ).map( Arrays::toString ).toArray( String[]::new ) ) );
-			System.out.println( "Fin Etapa 4" );
+			log.println( Arrays.toString( Arrays.stream( stage4 ).map( Arrays::toString ).toArray( String[]::new ) ) );
+			log.println( "Fin Etapa 4" );
+
+			serverCpuUsage = Double.parseDouble( evaluateForError( in.readLine( ) ) );
 		}
 		catch( Exception e )
 		{
-			e.printStackTrace( );
+			// e.printStackTrace( );
+			System.out.println( "ERROR: " + e.getMessage( ) );
 			out.println( join( Protocolo.SEP.value, Protocolo.ESTADO.value, Protocolo.ERROR.value ) );
 		}
 	}
@@ -188,8 +222,8 @@ public class Cliente implements Runnable
 	{
 		String line;
 		// INICIO DE SESION
-		out.println( Protocolo.HOLA.value );
-		line = in.readLine( );
+		out.println( join( Protocolo.SEP.value, Protocolo.HOLA.value, String.valueOf( status[ 0 ] ), String.valueOf( status[ 1 ] ), String.valueOf( status[ 2 ] ) ) );
+		line = evaluateForError( in.readLine( ) );
 		if( !line.equals( Protocolo.INICIO.value ) )
 		{
 			throw new Exception( line );
@@ -241,7 +275,7 @@ public class Cliente implements Runnable
 	 */
 	private X509Certificate stage3( ) throws Exception
 	{
-		String line = in.readLine( );
+		String line = evaluateForError( in.readLine( ) );
 		if( !line.equals( Protocolo.CERTSRV.value ) )
 		{
 			throw new Exception( line );
@@ -269,8 +303,10 @@ public class Cliente implements Runnable
 	 */
 	private byte[][] stage4( Double[] lat, Double[] lon, KeyPair keyPair, X509Certificate serverCertificate ) throws Exception
 	{
+		// Inicio Registro
+		registro.start( Registros.LLAVE_SIMETRICA );
 		// OBTENCION DE LLAVE SIMÉTRICA DEL SERVIDOR
-		String[] data = split( Protocolo.SEP.value, in.readLine( ) );
+		String[] data = split( Protocolo.SEP.value, evaluateForError( in.readLine( ) ) );
 		if( !data[ 0 ].equals( Protocolo.INICIO.value ) )
 		{
 			throw new Exception( data[ 0 ] );
@@ -281,15 +317,17 @@ public class Cliente implements Runnable
 		// La llave está codificada asimetricamente con la llave pública, toca pasar de Hexa a String
 		byte[] cipheredText = hexToByteArray( data[ 1 ] );
 		byte[] llaveSimetricaDescifrada = Cifrado.Asimetrico.descifrar( cipheredText, keyPair.getPrivate( ), algoritmoAsimetrico );
-		// Valid: System.out.println( new String( llaveSimetricaDescifrada, StandardCharsets.ISO_8859_1 ).getBytes( StandardCharsets.ISO_8859_1 ).length );
+		// Valid: log.println( new String( llaveSimetricaDescifrada, StandardCharsets.ISO_8859_1 ).getBytes( StandardCharsets.ISO_8859_1 ).length );
 
 		SecretKey key = new SecretKeySpec( llaveSimetricaDescifrada, 0, llaveSimetricaDescifrada.length, algoritmoSimetrico.getValue( ) );
+		registro.stop( Registros.LLAVE_SIMETRICA );
 
 		String pos = join( ",",
 						   join( " ", Arrays.stream( lat ).map( String::valueOf ).toArray( String[]::new ) ),
 						   join( " ", Arrays.stream( lon ).map( String::valueOf ).toArray( String[]::new ) ) );
 		byte[] positionCifradaLlaveSimetrica = Cifrado.Simetrico.cifrar( pos, key, algoritmoSimetrico );
 
+		registro.start( Registros.ACTUALIZACION );
 		// ENVIO DE POSICION ENCRIPTADO CON LLAVE SIMETRICA
 		out.println( join( Protocolo.SEP.value, Protocolo.ACT1.value, arrayToHexString( positionCifradaLlaveSimetrica ) ) );
 
@@ -303,6 +341,7 @@ public class Cliente implements Runnable
 		out.println( join( Protocolo.SEP.value, Protocolo.ACT2.value, arrayToHexString( positionCifrada ) ) );
 
 		readResponseState( );
+		registro.stop( Registros.ACTUALIZACION );
 
 		return new byte[][]{ positionCifradaLlaveSimetrica, positionCifradoHMAC };
 	}
@@ -314,10 +353,24 @@ public class Cliente implements Runnable
 	 */
 	private void readResponseState( ) throws Exception
 	{
-		String line = in.readLine( );
-		if( line.equals( Protocolo.ERROR.value ) )
+		evaluateForError( in.readLine( ) );
+	}
+
+	private String evaluateForError( String line ) throws Exception
+	{
+		if( line.startsWith( Protocolo.ERROR.value ) )
 		{
 			throw new Exception( line );
 		}
+		return line;
 	}
+
+	public Object[] getStatistics( )
+	{
+		return new Object[]{
+				registro.getReg( ),
+				serverCpuUsage
+		};
+	}
+
 }

@@ -20,7 +20,7 @@ public class Caso2
 										 {
 											 try
 											 {
-												 new Thread( new Cliente( ) ).start( );
+												 new Thread( new Cliente( true, null ) ).start( );
 											 }
 											 catch( IOException e )
 											 {

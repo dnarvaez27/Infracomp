@@ -1,6 +1,9 @@
 package infracomp.caso2;
 
 import javax.xml.bind.DatatypeConverter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -67,5 +70,30 @@ class Utils
 	static byte[] hexToByteArray( String str )
 	{
 		return DatatypeConverter.parseHexBinary( str );
+	}
+
+	public static class Registro<T>
+	{
+		private HashMap<T, Long> reg;
+
+		public Registro( )
+		{
+			reg = new HashMap<>( );
+		}
+
+		public void start( T titulo )
+		{
+			reg.put( titulo, System.currentTimeMillis( ) );
+		}
+
+		public void stop( T titulo )
+		{
+			reg.put( titulo, System.currentTimeMillis( ) - reg.get( titulo ) );
+		}
+
+		public Set<Map.Entry<T, Long>> getReg( )
+		{
+			return reg.entrySet( );
+		}
 	}
 }
