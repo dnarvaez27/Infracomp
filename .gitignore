@@ -23,3 +23,11 @@ hs_err_pid*
 
 *.iml
 /.idea
+/bin
+/out
+/docs/Caso3/ServerSS/.idea/
+/docs/Caso3/ServerSS/out/
+/docs/Caso3/Server/.idea/
+/docs/Caso3/Server/bin/
+*/META-INF
+MANIFEST.MF

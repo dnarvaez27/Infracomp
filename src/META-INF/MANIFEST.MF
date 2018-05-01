@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: bcpg-jdk15on-155.jar bcpkix-jdk15on-155.jar bcprov-jdk15on
- -155.jar GLoad_1.3.jar Servidorcs.jar
-Main-Class: infracomp.caso3.Caso3
-
